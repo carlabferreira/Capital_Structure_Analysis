@@ -23,7 +23,7 @@
 
 ### 2. Cálculo dos Limites/Necessidades de Caixa Ótimos:
 - inputs:  custos fixos de transação ($F$), a variância dos fluxos de caixa ($\sigma^2$), o custo de oportunidade ($K$) e o limite inferior definido ($I$)
-- Cálculo do saldo de caixa ótimo ($D^*$), o limite superior de caixa ótimo ($S^*$) e Saldo de caixa médio ótimo ($\overline{D}$) usando o Modelo Miller-Orr
+- Cálculo do saldo de caixa ótimo ($D^\*$), o limite superior de caixa ótimo ($S^\*$) e Saldo de caixa médio ótimo ($\overline{D}$) usando o Modelo Miller-Orr
 
 <p align="center">
   <img src="./AUXILIARES/image.png" alt="Formulas das necesidades de caixa ótimos" width="500">
