@@ -68,7 +68,7 @@ def analise_modelo_dinamico_e_termometro_de_liquidez(p_passivo, p_ativo, c_passi
     d["cdg"] = p_passivo - p_ativo
     d["ncg"] = c_ativo - c_passivo
     d["t"] = e_ativo - e_passivo
-    d["tl"] = d["t"]/abs(d["ncg"]) #16?
+    d["tl"] = d["t"]/abs(d["ncg"])
 
     return d
 
