@@ -25,7 +25,7 @@ Trabalho Prático da disciplina Admiistração Financeira (CAD167) em 2025/2 na 
 ### 1. Cálculo e Monitoramento do Termômetro de Liquidez (TL):
 - Cálculo das variáveis do Modelo Dinâmico: Capital de Giro (CDG), Necessidade de Capital de Giro (NCG) e Saldo de Tesouraria (T) a partir de dados de balanço (passivo e ativo permanentes/cíclicos/erráticos).
 
-- Cálculo do Termômetro de Liquidez ($TL$) usando a fórmula: $TL=\frac{T}{|NCG|}$ 16, onde $T$ é o Saldo de Tesouraria e $NCG$ é a Necessidade de Capital de Giro.
+- Cálculo do Termômetro de Liquidez ($TL$) usando a fórmula: $TL=\frac{T}{|NCG|}$, onde $T$ é o Saldo de Tesouraria e $NCG$ é a Necessidade de Capital de Giro.
 
 <p align="center">
   <img src="./AUXILIARES/image-2.png" alt="Formulas das variaveis do modelo dinâmico" width="500">
