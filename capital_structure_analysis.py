@@ -81,6 +81,21 @@ def analise_modelo_dinamico_e_termometro_de_liquidez(p_passivo, p_ativo, c_passi
 
     return d
 
+def entrada_dados_usuario_op_caixa_otimo():
+    c_fixo_transacao = input("Digite o custo fixo de transação (F):\n")
+    variancia_fluxo_caixa = input("Digite a variância dos fluxos de caixa (σ²):\n")
+    custo_oportunidade = input("Digite o custo de oportunidade (K):\n")
+    limite_inferior = input("Digite o limite inferior definido (I):\n")
+    return float(c_fixo_transacao), float(variancia_fluxo_caixa), float(custo_oportunidade), float(limite_inferior)
+
+def analise_caixa_otimo(c_fixo_transacao, variancia_fluxo_caixa, custo_oportunidade, limite_inferior):
+    d = {}
+    d["co"] = (((3 * c_fixo_transacao * variancia_fluxo_caixa) / (custo_oportunidade * 4)) ** (1/3)) + limite_inferior
+    d["lim_sup_co"] = (3 * d["co"]) - (2 * limite_inferior)
+    d["cmo"] = ((4 * d["co"]) - limite_inferior) / 3
+    
+    return d
+
 def main():
     # Organiza os argumentos de entrada e informa a forma correta de uso para o usuário
     args = setup()
@@ -102,7 +117,14 @@ def main():
 
     elif (opt == Option.LIMITES_E_SALDOS_DE_CAIXA_OTIMO):
         print("Análise: Limites e Saldos de Caixa Ótimo selecionada.")
-        pass
+
+        c_fixo_transacao, variancia_fluxo_caixa, custo_oportunidade, limite_inferior = entrada_dados_usuario_op_caixa_otimo()
+        dados = analise_caixa_otimo(float(c_fixo_transacao), float(variancia_fluxo_caixa), float(custo_oportunidade), float(limite_inferior))
+        
+        print(f"Saldo de Caixa Ótimo: {dados["co"]}")
+        print(f"Limite Superior de Caixa Ótimo: {dados["lim_sup_co"]}")
+        print(f"Saldo de Caixa Médio Ótimo: {dados["cmo"]}")
+
     elif (opt == Option.FLUXO_DE_CAIXA_COM_LIMITES):
         print("Análise: Fluxo de Caixa com Limites selecionada.")
         pass
