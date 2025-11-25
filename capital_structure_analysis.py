@@ -82,13 +82,20 @@ def main():
 
     if (opt == Option.MODELO_DINAMICO_E_TERMOMETRO_DE_LIQUIDEZ):
         print("Análise: Modelo Dinâmico e Termômetro de Liquidez selecionada.")
-        p_passivo = input("Digite o valor do passivo permanente")
-        p_ativo = input("Digite o valor do ativo permanente")
-        c_passivo = input("Digite o valor do passivo circulante")
-        c_ativo = input("Digite o valor do passivo circulante")
-        e_passivo = input("Digite o valor do passivo errático")
-        e_ativo = input("Digite o valor do passivo errático")
-        pass
+        p_passivo = input("Digite o valor do passivo permanente:\n")
+        p_ativo = input("Digite o valor do ativo permanente:\n")
+        c_passivo = input("Digite o valor do passivo circulante:\n")
+        c_ativo = input("Digite o valor do passivo circulante:\n")
+        e_passivo = input("Digite o valor do passivo errático:\n")
+        e_ativo = input("Digite o valor do passivo errático:\n")
+
+        dados  = analise_modelo_dinamico_e_termometro_de_liquidez(float(p_passivo), float(p_ativo), float(c_passivo), float(c_ativo), float(e_passivo), float(e_ativo))
+
+        print(f"Capital de Giro: {dados["cdg"]}")
+        print(f"Necessidades de Capital de Giro: {dados["ncg"]}")
+        print(f"Saldo de Tesouraria: {dados["t"]}")
+        print(f"Termômetro de Liquidez: {dados["tl"]}")
+
     elif (opt == Option.LIMITES_E_SALDOS_DE_CAIXA_OTIMO):
         print("Análise: Limites e Saldos de Caixa Ótimo selecionada.")
         pass
