@@ -63,6 +63,15 @@ class Option(Enum):
     FLUXO_DE_CAIXA_COM_LIMITES = 2
     ESTRUTURA_DE_CAPITAL = 3 
 
+def entrada_dados_usuario_op_modelo_dinamico():
+    p_passivo = input("Digite o valor do passivo permanente:\n")
+    p_ativo = input("Digite o valor do ativo permanente:\n")
+    c_passivo = input("Digite o valor do passivo cíclico:\n")
+    c_ativo = input("Digite o valor do ativo cíclico:\n")
+    e_passivo = input("Digite o valor do passivo errático:\n")
+    e_ativo = input("Digite o valor do ativo errático:\n")
+    return float(p_passivo), float(p_ativo), float(c_passivo), float(c_ativo), float(e_passivo), float(e_ativo)
+
 def analise_modelo_dinamico_e_termometro_de_liquidez(p_passivo, p_ativo, c_passivo, c_ativo, e_passivo, e_ativo):
     d = {}
     d["cdg"] = p_passivo - p_ativo
@@ -82,13 +91,8 @@ def main():
 
     if (opt == Option.MODELO_DINAMICO_E_TERMOMETRO_DE_LIQUIDEZ):
         print("Análise: Modelo Dinâmico e Termômetro de Liquidez selecionada.")
-        p_passivo = input("Digite o valor do passivo permanente:\n")
-        p_ativo = input("Digite o valor do ativo permanente:\n")
-        c_passivo = input("Digite o valor do passivo circulante:\n")
-        c_ativo = input("Digite o valor do passivo circulante:\n")
-        e_passivo = input("Digite o valor do passivo errático:\n")
-        e_ativo = input("Digite o valor do passivo errático:\n")
-
+        
+        p_passivo, p_ativo, c_passivo, c_ativo, e_passivo, e_ativo = entrada_dados_usuario_op_modelo_dinamico()
         dados  = analise_modelo_dinamico_e_termometro_de_liquidez(float(p_passivo), float(p_ativo), float(c_passivo), float(c_ativo), float(e_passivo), float(e_ativo))
 
         print(f"Capital de Giro: {dados["cdg"]}")
