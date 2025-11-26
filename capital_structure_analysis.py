@@ -117,8 +117,8 @@ def mostrar_estrutura_de_capital_da_empresa(investimento_op_giro, investimento_a
 
     #A altura da maior caixa é definida em 500 (se mudar este valor for desejável, mudar também a largura padrão da imagem)
     standard_t = 500
-    #A largura da imagem é definida em 600 (se mudar este valor for desejável, mudar também a altura padrão da maior caixa)
-    largura = 600
+    #A largura da imagem é definida em 700 (se mudar este valor for desejável, mudar também a altura padrão da maior caixa)
+    largura = 700
 
     #O tamanho de cada caixa é calculado fazendo uma regra de 3 com o tamanho padrão
     iaf_rec_t = int((investimento_ativos_fixos * standard_t) / standard)
@@ -138,9 +138,9 @@ def mostrar_estrutura_de_capital_da_empresa(investimento_op_giro, investimento_a
     #Calcula as coordenadas de cada caixa
     iaf_rec = [0, altura-iaf_rec_t, largura/2, altura]
     iopg_rec = [0, altura-iopg_rec_t-iaf_rec_t, largura/2, altura-iaf_rec_t]
-    dlcp_rec = [largura/2, altura-dlcp_rec_t, largura, altura]
-    dlp_rec = [largura/2, altura-dlcp_rec_t-dlp_rec_t, largura, altura-dlcp_rec_t]
-    cp_rec = [largura/2, altura-cp_rec_t-dlp_rec_t-dlcp_rec_t, largura, altura-dlcp_rec_t-dlp_rec_t]
+    cp_rec = [largura/2, altura-cp_rec_t, largura, altura]
+    dlp_rec = [largura/2, altura-cp_rec_t-dlp_rec_t, largura, altura-cp_rec_t]
+    dlcp_rec = [largura/2, altura-cp_rec_t-dlp_rec_t-dlcp_rec_t, largura, altura-cp_rec_t-dlp_rec_t]
 
     #Calcula o tamanho das fontes
     fonte_iaf = ImageFont.truetype("arial.ttf", int(math.ceil(iaf_rec_t/10)))
@@ -151,20 +151,20 @@ def mostrar_estrutura_de_capital_da_empresa(investimento_op_giro, investimento_a
 
     #Desenha cada uma das caixas e escreve o texto de acordo
     desenho.rectangle(iaf_rec, outline="black", fill="#cccc98") #Retângulo investimento em ativos fixos
-    desenho.multiline_text((10, (altura-iaf_rec_t)), "Investimento\nem\nAtivos Fixos", fill="black", font=fonte_iaf, align="center")
+    desenho.multiline_text((10, (altura - iaf_rec_t)), "Investimento\nem\nAtivos Fixos", fill="black", font=fonte_iaf, align="center")
 
     desenho.rectangle(iopg_rec, outline="black", fill="#cccc98") #Retângulo investimento operacional em giro
-    desenho.multiline_text((10, (altura-iopg_rec_t-iaf_rec_t)), "Investimento\nOperacional\nem Giro", fill="black", font=fonte_iopg, align="center")
-
-    desenho.rectangle(cp_rec, outline="black", fill="#cccc98") #Retângulo capital próprio
-    desenho.multiline_text(((largura/2) + 10, (altura-cp_rec_t-dlp_rec_t-dlcp_rec_t)), "Capital\nPróprio", fill="black", font=fonte_cp, align="center")
+    desenho.multiline_text((10, (altura - iopg_rec_t - iaf_rec_t)), "Investimento\nOperacional\nem Giro", fill="black", font=fonte_iopg, align="center")
+    
+    desenho.rectangle(dlcp_rec, outline="black", fill="#cccc98") #Retângulo dívida líquida a curto prazo
+    desenho.multiline_text(((largura/2) + 10, altura - cp_rec_t - dlp_rec_t - dlcp_rec_t), "Divida Líquida\na Curto Prazo", fill="black", font=fonte_dlcp, align="center")
 
     desenho.rectangle(dlp_rec, outline="black", fill="#cccc98") #Retângulo dívida a longo prazo
-    desenho.multiline_text(((largura/2) + 10, altura-dlcp_rec_t-dlp_rec_t), "Dívida\na\nLongo Prazo", fill="black", font=fonte_dlp, align="center")
+    desenho.multiline_text(((largura/2) + 10, altura - cp_rec_t - dlp_rec_t), "Dívida\na\nLongo Prazo", fill="black", font=fonte_dlp, align="center")
 
-    desenho.rectangle(dlcp_rec, outline="black", fill="#cccc98") #Retângulo dívida líquida a curto prazo
-    desenho.multiline_text(((largura/2) + 10, altura-dlcp_rec_t), "Divida Líquida\na Curto Prazo", fill="black", font=fonte_dlcp, align="center")
-    
+    desenho.rectangle(cp_rec, outline="black", fill="#cccc98") #Retângulo capital próprio
+    desenho.multiline_text(((largura/2) + 10, (altura - cp_rec_t)), "Capital\nPróprio", fill="black", font=fonte_cp, align="center")
+
     #Exibe a imagem na tela
     imagem.show()
     #Salva a imagem com o nome dado
