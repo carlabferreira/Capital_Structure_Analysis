@@ -98,6 +98,7 @@ def analise_caixa_otimo(c_fixo_transacao, variancia_fluxo_caixa, custo_oportunid
     
     return d
 
+
 #OP FLUXO DE CAIXA COM LIMITES
 #(...)
 #OP FLUXO DE CAIXA COM LIMITES
@@ -111,10 +112,17 @@ def entrada_dados_estrutura_de_capital_da_empresa():
 
     return int(investimento_op_giro), int(investimento_ativos_fixos), int(divida_liquida_curto_prazo), int(divida_longo_prazo), int(capital_proprio)
 
-def mostrar_estrutura_de_capital_da_empresa(investimento_op_giro, investimento_ativos_fixos, divida_liquida_curto_prazo, divida_longo_prazo, capital_proprio):
+# Obtem o tamanho e estilo da fonte com base no tamanho da caixa, 
+# utilizado na função mostrar_estrutura_de_capital_da_empresa
+def obter_fonte(tamanho_caixa):
     # Definições de tamanho mínimo e fator de escala para as fontes
     TAMANHO_MINIMO_FONTE = 12
     FATOR_ESCALA_FONTE = 10
+
+    tamanho_fonte = max(TAMANHO_MINIMO_FONTE, int(math.ceil(tamanho_caixa / FATOR_ESCALA_FONTE)))
+    return ImageFont.truetype("arial.ttf", tamanho_fonte)
+
+def mostrar_estrutura_de_capital_da_empresa(investimento_op_giro, investimento_ativos_fixos, divida_liquida_curto_prazo, divida_longo_prazo, capital_proprio):
     
     # Toma como padrão o maior valor; 
     # isto é feito para que nenhuma fonte fique grande demais (a maior fonte será o padrão)
@@ -152,28 +160,48 @@ def mostrar_estrutura_de_capital_da_empresa(investimento_op_giro, investimento_a
     # Calcula o tamanho das fontes
     # O valor é o máximo entre uma proporção do valor calculado a partir do tamanho da caixa 
     # e o tamanho mínimo definido, para evitar fontes muito pequenas
-    fonte_iaf = ImageFont.truetype("arial.ttf", max(int(math.ceil(iaf_rec_t/FATOR_ESCALA_FONTE)), TAMANHO_MINIMO_FONTE))
-    fonte_iopg = ImageFont.truetype("arial.ttf", max(int(math.ceil(iopg_rec_t/FATOR_ESCALA_FONTE)), TAMANHO_MINIMO_FONTE))
-    fonte_dlcp = ImageFont.truetype("arial.ttf", max(int(math.ceil(dlcp_rec_t/FATOR_ESCALA_FONTE)), TAMANHO_MINIMO_FONTE))
-    fonte_dlp = ImageFont.truetype("arial.ttf", max(int(math.ceil(dlp_rec_t/FATOR_ESCALA_FONTE)), TAMANHO_MINIMO_FONTE))
-    fonte_cp = ImageFont.truetype("arial.ttf", max(int(math.ceil(cp_rec_t/FATOR_ESCALA_FONTE)), TAMANHO_MINIMO_FONTE))
+    fonte_iaf = obter_fonte(iaf_rec_t)
+    fonte_iopg = obter_fonte(iopg_rec_t)
+    fonte_dlcp = obter_fonte(dlcp_rec_t)
+    fonte_dlp = obter_fonte(dlp_rec_t)
+    fonte_cp = obter_fonte(cp_rec_t)
 
     # Desenha cada uma das caixas e escreve o texto de acordo
-    desenho.rectangle(iaf_rec, outline="black", fill="#cccc98") # Retângulo investimento em ativos fixos
-    desenho.multiline_text((10, (altura - iaf_rec_t)), "Investimento\nem\nAtivos Fixos", fill="black", font=fonte_iaf, align="center")
-
-    desenho.rectangle(iopg_rec, outline="black", fill="#cccc98") # Retângulo investimento operacional em giro
-    desenho.multiline_text((10, (altura - iopg_rec_t - iaf_rec_t)), "Investimento\nOperacional\nem Giro", fill="black", font=fonte_iopg, align="center")
+    # Retângulo investimento em ativos fixos
+    desenho.rectangle(iaf_rec, outline="black", fill="#cccc98")
+    pos_x_iaf = largura / 4
+    pos_y_iaf = iaf_rec[1] + (iaf_rec_t / 2) # Y_inicio + (altura_caixa / 2)
+    desenho.multiline_text((pos_x_iaf, pos_y_iaf), "Investimento\nem\nAtivos Fixos", 
+                            fill="black", font=fonte_iaf, align="center", anchor="mm")
     
-    desenho.rectangle(dlcp_rec, outline="black", fill="#cccc98") # Retângulo dívida líquida a curto prazo
-    desenho.multiline_text(((largura/2) + 10, altura - cp_rec_t - dlp_rec_t - dlcp_rec_t), "Divida Líquida\na Curto Prazo", fill="black", font=fonte_dlcp, align="center")
+    # Retângulo investimento operacional em giro
+    desenho.rectangle(iopg_rec, outline="black", fill="#cccc98") 
+    pos_x_iopg = largura / 4
+    pos_y_iopg = iopg_rec[1] + (iopg_rec_t / 2)
+    desenho.multiline_text((pos_x_iopg, pos_y_iopg), "Investimento\nOperacional\nem Giro", 
+                            fill="black", font=fonte_iopg, align="center", anchor="mm")
+    
+    # Retângulo dívida líquida a curto prazo
+    desenho.rectangle(dlcp_rec, outline="black", fill="#cccc98") 
+    pos_x_dlcp = (3 * largura) / 4
+    pos_y_dlcp = dlcp_rec[1] + (dlcp_rec_t / 2)
+    desenho.multiline_text((pos_x_dlcp, pos_y_dlcp), "Dívida Líquida\na Curto Prazo", 
+                        fill="black", font=fonte_dlcp, align="center", anchor="mm")
 
-    desenho.rectangle(dlp_rec, outline="black", fill="#cccc98") # Retângulo dívida a longo prazo
-    desenho.multiline_text(((largura/2) + 10, altura - cp_rec_t - dlp_rec_t), "Dívida\na\nLongo Prazo", fill="black", font=fonte_dlp, align="center")
+    # Retângulo dívida a longo prazo
+    desenho.rectangle(dlp_rec, outline="black", fill="#cccc98")
+    pos_x_dlp = (3 * largura) / 4
+    pos_y_dlp = dlp_rec[1] + (dlp_rec_t / 2)
+    desenho.multiline_text((pos_x_dlp, pos_y_dlp), "Dívida\na\nLongo Prazo", 
+                        fill="black", font=fonte_dlp, align="center", anchor="mm")
 
-    desenho.rectangle(cp_rec, outline="black", fill="#cccc98") # Retângulo capital próprio
-    desenho.multiline_text(((largura/2) + 10, (altura - cp_rec_t)), "Capital\nPróprio", fill="black", font=fonte_cp, align="center")
-
+    # Retângulo capital próprio
+    desenho.rectangle(cp_rec, outline="black", fill="#cccc98") 
+    pos_x_cp = (3 * largura) / 4
+    pos_y_cp = cp_rec[1] + (cp_rec_t / 2)
+    desenho.multiline_text((pos_x_cp, pos_y_cp), "Capital\nPróprio", 
+                        fill="black", font=fonte_cp, align="center", anchor="mm")
+    
     # Exibe a imagem na tela
     imagem.show()
     # Salva a imagem com o nome dado
