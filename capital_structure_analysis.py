@@ -133,10 +133,10 @@ def mostrar_estrutura_de_capital_da_empresa(investimento_op_giro, investimento_a
     # A altura da imagem é definida pela altura da coluna mais alta
     altura = max(iaf_rec_t + iopg_rec_t, dlcp_rec_t + dlp_rec_t + cp_rec_t)
 
-    imagem = Image.new("RGB", (largura, altura), "black")
+    imagem = Image.new("RGB", (largura, altura), "white")
     desenho = ImageDraw.Draw(imagem)
 
-    desenho.rectangle([0, 0, largura-1, altura-1], outline="black")
+    desenho.rectangle([0, 0, largura-1, altura-1], outline="white")
 
     # Calcula as coordenadas de cada caixa
     iaf_rec = [0, altura-iaf_rec_t, largura/2, altura]
