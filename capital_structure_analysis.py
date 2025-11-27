@@ -118,8 +118,18 @@ def obter_fonte(tamanho_caixa):
     # Definições de tamanho mínimo e fator de escala para as fontes
     TAMANHO_MINIMO_FONTE = 12
     FATOR_ESCALA_FONTE = 10
+    TAMANHO_MINIMO_CAIXA = 42
 
-    tamanho_fonte = max(TAMANHO_MINIMO_FONTE, int(math.ceil(tamanho_caixa / FATOR_ESCALA_FONTE)))
+    # Se a caixa for pequena demais para a fonte mínima, uma fórmula é usada para definir
+    # o tamanho da fonte; se a caixa for duas vezes menor do que o tamanho mínimo, a mesma
+    # fórmula das maiores caixas é usada
+    if tamanho_caixa <= TAMANHO_MINIMO_CAIXA/2:
+        tamanho_fonte = int(math.ceil(tamanho_caixa / FATOR_ESCALA_FONTE))
+    elif tamanho_caixa <= TAMANHO_MINIMO_CAIXA:
+        tamanho_fonte = int(math.ceil(tamanho_caixa / (FATOR_ESCALA_FONTE/2)))
+    # Do contrário, o maior valor entre a fonte mínima e o valor da fórmula é usado
+    else:
+        tamanho_fonte = max(TAMANHO_MINIMO_FONTE, int(math.ceil(tamanho_caixa / FATOR_ESCALA_FONTE)))
     return ImageFont.truetype("arial.ttf", tamanho_fonte)
 
 def mostrar_estrutura_de_capital_da_empresa(investimento_op_giro, investimento_ativos_fixos, divida_liquida_curto_prazo, divida_longo_prazo, capital_proprio):
