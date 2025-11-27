@@ -47,7 +47,9 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import argparse
+import math
 from enum import Enum
+from PIL import Image, ImageDraw, ImageFont
 
 def setup():
     parser = argparse.ArgumentParser()
@@ -96,6 +98,115 @@ def analise_caixa_otimo(c_fixo_transacao, variancia_fluxo_caixa, custo_oportunid
     
     return d
 
+
+#OP FLUXO DE CAIXA COM LIMITES
+#(...)
+#OP FLUXO DE CAIXA COM LIMITES
+
+def entrada_dados_estrutura_de_capital_da_empresa():
+    investimento_op_giro = input("Digite o valor do investimento operacional em giro:\n")
+    investimento_ativos_fixos = input("Digite o valor dos investimentos em ativos fixos\n")
+    divida_liquida_curto_prazo = input("Digite o valor da dívida líquida a curto prazo\n")
+    divida_longo_prazo = input("Digite o valor das dívidas a longo prazo\n")
+    capital_proprio = input("Digite o valor do capital próprio\n")
+
+    return int(investimento_op_giro), int(investimento_ativos_fixos), int(divida_liquida_curto_prazo), int(divida_longo_prazo), int(capital_proprio)
+
+# Obtem o tamanho e estilo da fonte com base no tamanho da caixa, 
+# utilizado na função mostrar_estrutura_de_capital_da_empresa
+def obter_fonte(tamanho_caixa):
+    # Definições de tamanho mínimo e fator de escala para as fontes
+    TAMANHO_MINIMO_FONTE = 12
+    FATOR_ESCALA_FONTE = 10
+
+    tamanho_fonte = max(TAMANHO_MINIMO_FONTE, int(math.ceil(tamanho_caixa / FATOR_ESCALA_FONTE)))
+    return ImageFont.truetype("arial.ttf", tamanho_fonte)
+
+def mostrar_estrutura_de_capital_da_empresa(investimento_op_giro, investimento_ativos_fixos, divida_liquida_curto_prazo, divida_longo_prazo, capital_proprio):
+    
+    # Toma como padrão o maior valor; 
+    # isto é feito para que nenhuma fonte fique grande demais (a maior fonte será o padrão)
+    standard = max(investimento_op_giro, investimento_ativos_fixos, divida_liquida_curto_prazo, divida_longo_prazo, capital_proprio)
+
+    # A altura da maior caixa é definida em 500 (se mudar este valor for desejável, 
+    # mudar também a largura padrão da imagem)
+    standard_t = 500
+    # A largura da imagem é definida em 700 (se mudar este valor for desejável, 
+    # mudar também a altura padrão da maior caixa)
+    largura = 700
+
+    # O tamanho de cada caixa é calculado fazendo uma regra de 3 com o tamanho padrão
+    iaf_rec_t = int((investimento_ativos_fixos * standard_t) / standard)
+    iopg_rec_t = int((investimento_op_giro * standard_t) / standard)
+    dlcp_rec_t = int((divida_liquida_curto_prazo * standard_t) / standard)
+    dlp_rec_t = int((divida_longo_prazo * standard_t) / standard)
+    cp_rec_t = int((capital_proprio * standard_t) / standard)
+
+    # A altura da imagem é definida pela altura da coluna mais alta
+    altura = max(iaf_rec_t + iopg_rec_t, dlcp_rec_t + dlp_rec_t + cp_rec_t)
+
+    imagem = Image.new("RGB", (largura, altura), "white")
+    desenho = ImageDraw.Draw(imagem)
+
+    desenho.rectangle([0, 0, largura-1, altura-1], outline="white")
+
+    # Calcula as coordenadas de cada caixa
+    iaf_rec = [0, altura-iaf_rec_t, largura/2, altura]
+    iopg_rec = [0, altura-iopg_rec_t-iaf_rec_t, largura/2, altura-iaf_rec_t]
+    cp_rec = [largura/2, altura-cp_rec_t, largura, altura]
+    dlp_rec = [largura/2, altura-cp_rec_t-dlp_rec_t, largura, altura-cp_rec_t]
+    dlcp_rec = [largura/2, altura-cp_rec_t-dlp_rec_t-dlcp_rec_t, largura, altura-cp_rec_t-dlp_rec_t]
+
+    # Calcula o tamanho das fontes
+    # O valor é o máximo entre uma proporção do valor calculado a partir do tamanho da caixa 
+    # e o tamanho mínimo definido, para evitar fontes muito pequenas
+    fonte_iaf = obter_fonte(iaf_rec_t)
+    fonte_iopg = obter_fonte(iopg_rec_t)
+    fonte_dlcp = obter_fonte(dlcp_rec_t)
+    fonte_dlp = obter_fonte(dlp_rec_t)
+    fonte_cp = obter_fonte(cp_rec_t)
+
+    # Desenha cada uma das caixas e escreve o texto de acordo
+    # Retângulo investimento em ativos fixos
+    desenho.rectangle(iaf_rec, outline="black", fill="#cccc98")
+    pos_x_iaf = largura / 4
+    pos_y_iaf = iaf_rec[1] + (iaf_rec_t / 2) # Y_inicio + (altura_caixa / 2)
+    desenho.multiline_text((pos_x_iaf, pos_y_iaf), "Investimento\nem\nAtivos Fixos", 
+                            fill="black", font=fonte_iaf, align="center", anchor="mm")
+    
+    # Retângulo investimento operacional em giro
+    desenho.rectangle(iopg_rec, outline="black", fill="#cccc98") 
+    pos_x_iopg = largura / 4
+    pos_y_iopg = iopg_rec[1] + (iopg_rec_t / 2)
+    desenho.multiline_text((pos_x_iopg, pos_y_iopg), "Investimento\nOperacional\nem Giro", 
+                            fill="black", font=fonte_iopg, align="center", anchor="mm")
+    
+    # Retângulo dívida líquida a curto prazo
+    desenho.rectangle(dlcp_rec, outline="black", fill="#cccc98") 
+    pos_x_dlcp = (3 * largura) / 4
+    pos_y_dlcp = dlcp_rec[1] + (dlcp_rec_t / 2)
+    desenho.multiline_text((pos_x_dlcp, pos_y_dlcp), "Dívida Líquida\na Curto Prazo", 
+                        fill="black", font=fonte_dlcp, align="center", anchor="mm")
+
+    # Retângulo dívida a longo prazo
+    desenho.rectangle(dlp_rec, outline="black", fill="#cccc98")
+    pos_x_dlp = (3 * largura) / 4
+    pos_y_dlp = dlp_rec[1] + (dlp_rec_t / 2)
+    desenho.multiline_text((pos_x_dlp, pos_y_dlp), "Dívida\na\nLongo Prazo", 
+                        fill="black", font=fonte_dlp, align="center", anchor="mm")
+
+    # Retângulo capital próprio
+    desenho.rectangle(cp_rec, outline="black", fill="#cccc98") 
+    pos_x_cp = (3 * largura) / 4
+    pos_y_cp = cp_rec[1] + (cp_rec_t / 2)
+    desenho.multiline_text((pos_x_cp, pos_y_cp), "Capital\nPróprio", 
+                        fill="black", font=fonte_cp, align="center", anchor="mm")
+    
+    # Exibe a imagem na tela
+    imagem.show()
+    # Salva a imagem com o nome dado
+    imagem.save("Estrutura de Capital da Empresa.png")
+
 def main():
     # Organiza os argumentos de entrada e informa a forma correta de uso para o usuário
     args = setup()
@@ -130,6 +241,8 @@ def main():
         pass
     elif (opt == Option.ESTRUTURA_DE_CAPITAL):
         print("Análise: Estrutura de Capital selecionada.")
+        iopg, iaf, dlcp, dlp, cp = entrada_dados_estrutura_de_capital_da_empresa()
+        mostrar_estrutura_de_capital_da_empresa(iopg, iaf, dlcp, dlp, cp)
         pass
 
     # Verifica se usuário solicitou geração de relatório e se sim, gera o arquivo com o nome dado
