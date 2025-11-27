@@ -112,6 +112,10 @@ def entrada_dados_estrutura_de_capital_da_empresa():
     return int(investimento_op_giro), int(investimento_ativos_fixos), int(divida_liquida_curto_prazo), int(divida_longo_prazo), int(capital_proprio)
 
 def mostrar_estrutura_de_capital_da_empresa(investimento_op_giro, investimento_ativos_fixos, divida_liquida_curto_prazo, divida_longo_prazo, capital_proprio):
+    # Definições de tamanho mínimo e fator de escala para as fontes
+    TAMANHO_MINIMO_FONTE = 12
+    FATOR_ESCALA_FONTE = 10
+    
     # Toma como padrão o maior valor; 
     # isto é feito para que nenhuma fonte fique grande demais (a maior fonte será o padrão)
     standard = max(investimento_op_giro, investimento_ativos_fixos, divida_liquida_curto_prazo, divida_longo_prazo, capital_proprio)
@@ -146,11 +150,13 @@ def mostrar_estrutura_de_capital_da_empresa(investimento_op_giro, investimento_a
     dlcp_rec = [largura/2, altura-cp_rec_t-dlp_rec_t-dlcp_rec_t, largura, altura-cp_rec_t-dlp_rec_t]
 
     # Calcula o tamanho das fontes
-    fonte_iaf = ImageFont.truetype("arial.ttf", int(math.ceil(iaf_rec_t/10)))
-    fonte_iopg = ImageFont.truetype("arial.ttf", int(math.ceil(iopg_rec_t/10)))
-    fonte_dlcp = ImageFont.truetype("arial.ttf", int(math.ceil(dlcp_rec_t/10)))
-    fonte_dlp = ImageFont.truetype("arial.ttf", int(math.ceil(dlp_rec_t/10)))
-    fonte_cp = ImageFont.truetype("arial.ttf", int(math.ceil(cp_rec_t/10)))
+    # O valor é o máximo entre uma proporção do valor calculado a partir do tamanho da caixa 
+    # e o tamanho mínimo definido, para evitar fontes muito pequenas
+    fonte_iaf = ImageFont.truetype("arial.ttf", max(int(math.ceil(iaf_rec_t/FATOR_ESCALA_FONTE)), TAMANHO_MINIMO_FONTE))
+    fonte_iopg = ImageFont.truetype("arial.ttf", max(int(math.ceil(iopg_rec_t/FATOR_ESCALA_FONTE)), TAMANHO_MINIMO_FONTE))
+    fonte_dlcp = ImageFont.truetype("arial.ttf", max(int(math.ceil(dlcp_rec_t/FATOR_ESCALA_FONTE)), TAMANHO_MINIMO_FONTE))
+    fonte_dlp = ImageFont.truetype("arial.ttf", max(int(math.ceil(dlp_rec_t/FATOR_ESCALA_FONTE)), TAMANHO_MINIMO_FONTE))
+    fonte_cp = ImageFont.truetype("arial.ttf", max(int(math.ceil(cp_rec_t/FATOR_ESCALA_FONTE)), TAMANHO_MINIMO_FONTE))
 
     # Desenha cada uma das caixas e escreve o texto de acordo
     desenho.rectangle(iaf_rec, outline="black", fill="#cccc98") # Retângulo investimento em ativos fixos
