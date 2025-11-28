@@ -12,15 +12,32 @@
 #   obtidos via API e informações fornecidas pelo usuário.          #
 # ----------------------------------------------------------------- #
 # - OPÇÕES DE ANÁLISE:                                              #
-# todo adicionar descrições das opções!
 #   0: Modelo Dinâmico e Termômetro de Liquidez                     #
-#       - 
+#       - Cálculo das variáveis do Modelo Dinâmico:                 #
+#       Capital de Giro (CDG), Necessidade de Capital de Giro (NCG) #
+#       e Saldo de Tesouraria (T) a partir de dados de balanço      #
+#       (passivo e ativo permanentes/cíclicos/erráticos).           #
+#       - Cálculo do Termômetro de Liquidez (TL) a partir do saldo  #
+#       de tesouraria e da necessidade de capital de giro.          #
+#       - Atualmente com dados fornecidos pelo usuário.             #
+#       - Futuro: integração com API para obtenção automática       #
+#       dos dados.                                                  # 
 #   1: Limites e Saldos de Caixa Ótimo                              #
-#      -
+#      - Cálculo do Saldo de Caixa Ótimo (D*),                      #
+#       Limite Superior de Caixa Ótimo(S*) e                        #
+#       Saldo de Caixa Médio ótimo (D')                             #
+#       - Atualmente com dados fornecidos pelo usuário.             #
+#       - Futuro: integração com API para obtenção automática       #
+#       dos dados.                                                  # 
 #   2: Fluxo de Caixa com Limites                                   #
-#     -
+#     - Geração de gráfico do fluxo de caixa histórico com limites  #
+#       inferior, superior e saldo de caixa apropriado.             #
+#     - Obtenção dos dados históricos via API dadosdemercado.com.br #
+#       ou entrada manual pelo usuário.                             #
 #   3: Estrutura de Capital                                         #
-#      -
+#      - Geração de diagrama representando a estrutura de capital   #
+#       da empresa com base nos investimentos e fontes de capital.  #  
+#      - Atualmente com dados fornecidos pelo usuário.              #
 # ----------------------------------------------------------------- #
 # - REPOSITÓRIO GITHUB:                                             #
 #   https://github.com/carlabferreira/Capital_Structure_Analysis    #
@@ -403,6 +420,7 @@ def main():
         report_fname = args.report
         if not report_fname.endswith(".html"):
             report_fname += ".html"
+        print(f"Geração de relatório solicitada mas não implementada ainda.")
         # todo generate report
 
 
