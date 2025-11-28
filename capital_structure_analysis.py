@@ -98,8 +98,63 @@ def analise_caixa_otimo(c_fixo_transacao, variancia_fluxo_caixa, custo_oportunid
     
     return d
 
+def entrada_dados_usuario_op_fluxo_caixa():
+    print(f"Forneça dados para análise de fluxo de caixa com limites.\nSugestão: Caso deseje, utilize a opção {Option.LIMITES_E_SALDOS_DE_CAIXA_OTIMO} para calcular valores base de caixa ótimo." )
+    saldo_caixa_apropriado = input("Digite o saldo de caixa apropriado (D):\n")
+    limite_inferior = input("Digite o limite inferior definido pela gestão (I):\n")
+    limite_superior = input("Digite o limite superior (S):\n")
+    if limite_inferior >= saldo_caixa_apropriado or saldo_caixa_apropriado >= limite_superior:
+        print("Erro: Os valores fornecidos não satisfazem a condição I < D < S. Por favor, insira os valores novamente.\n")
+        return entrada_dados_usuario_op_fluxo_caixa()
+    return float(saldo_caixa_apropriado), float(limite_inferior), float(limite_superior)
 
-#OP FLUXO DE CAIXA COM LIMITES
+def entrada_dados_historicos_usuario_op_fluxo_caixa():
+    num_periodos = int(input("Digite o número de períodos históricos disponíveis:\n"))
+    fluxos_caixa = {}
+    for i in range(num_periodos):
+        fluxo = float(input(f"Digite o fluxo de caixa do período {i+1}:\n"))
+        fluxos_caixa[i] = fluxo
+    return fluxos_caixa
+
+def obter_dados_historicos_api_op_fluxo_caixa(token):
+    # todo implementar obtenção de dados via API
+    pass
+
+def mostrar_grafico_fluxo_caixa_com_limites(dados_fluxo_caixa, saldo_caixa_apropriado, limite_inferior, limite_superior):
+    plt.figure(figsize=(10, 5))
+
+    # Utiliza os dados fornecidos para plotar o gráfico
+    datas = list(dados_fluxo_caixa.keys())
+    valores = list(dados_fluxo_caixa.values())
+    plt.plot(datas, valores, marker='o', label='Fluxo de Caixa Histórico', color='black')
+
+    # Imprime as linhas dos limites
+    x_pos = len(datas) - 1 + 0.1  # Posição x para as legendas ao lado da linha
+    plt.axhline(y=saldo_caixa_apropriado, color='g', linestyle='--', xmax = len(datas) - 1)
+    plt.axhline(y=limite_inferior, color='r', linestyle='--', xmax = len(datas) - 1)
+    plt.axhline(y=limite_superior, color='b', linestyle='--', xmax = len(datas) - 1)
+
+    # Adiciona legendas ao lado da linha para os limites
+    plt.text(x_pos, saldo_caixa_apropriado - 0.7, '(D)', 
+         color='g', va='center', ha='left', fontsize=9)
+    
+    plt.text(x_pos, limite_inferior + 0.7, '(I)', 
+         color='r', va='center', ha='left', fontsize=9)
+    
+    plt.text(x_pos, limite_superior - 0.7, '(S)', 
+         color='b', va='center', ha='left', fontsize=9)
+
+    # Adiciona informações relevantes ao gráfico
+    plt.title('Fluxo de Caixa com Limites')
+    plt.xlabel('Períodos')
+    plt.ylabel('Fluxo de Caixa')
+    plt.legend()
+    plt.grid()
+    
+    # Salva a imagem
+    plt.savefig("Fluxo de Caixa com Limites.png")
+
+    return
 #(...)
 #OP FLUXO DE CAIXA COM LIMITES
 
@@ -238,7 +293,16 @@ def main():
 
     elif (opt == Option.FLUXO_DE_CAIXA_COM_LIMITES):
         print("Análise: Fluxo de Caixa com Limites selecionada.")
-        pass
+        saldo_caixa_apropriado, limite_inferior, limite_superior = entrada_dados_usuario_op_fluxo_caixa()
+        if not token:
+            print("Nenhum token de API fornecido. Insira os valores históricos manualmente.")
+            dados_fluxo_caixa = entrada_dados_historicos_usuario_op_fluxo_caixa()
+        else:
+            print("Token de API fornecido. Obtendo dados via API...")
+            dados_fluxo_caixa = obter_dados_historicos_api_op_fluxo_caixa(token)
+
+        mostrar_grafico_fluxo_caixa_com_limites(dados_fluxo_caixa, saldo_caixa_apropriado, limite_inferior, limite_superior)
+
     elif (opt == Option.ESTRUTURA_DE_CAPITAL):
         print("Análise: Estrutura de Capital selecionada.")
         iopg, iaf, dlcp, dlp, cp = entrada_dados_estrutura_de_capital_da_empresa()
