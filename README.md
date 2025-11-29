@@ -13,8 +13,9 @@ Trabalho Prático da disciplina Admiistração Financeira (CAD167) em 2025/2 na 
     - [Impressão do Fluxo De Caixa com limites inferior e superior](#3-impressão-do-fluxo-de-caixa-com-limites-inferior-e-superior)
     - [Impressão da Estrutura de Capital da Empresa](#4-impressão-da-estrutura-de-capital-da-empresa)
 
-3. [Conceitos Utilizados](#explicação-do-sistema)
-4. [Referências](#referências)
+3. [Conceitos Utilizados](#conceitos-utilizados)
+4. [Intruções de uso e exemplos](#instruções-de-uso)
+5. [Referências](#referências)
 
 ## Membros do grupo:
 1) Carla Beatriz Ferreira
@@ -96,6 +97,41 @@ Esta seção apresenta um breve resumo dos conceitos utilizados para realizaçã
     - [Modelo Dinâmico de Capital de Giro - PUC RIO](./AUXILIARES/13057_4.PDF)
     - [O modelo dinâmico de gestão financeira de empresas: Procedimentos de Operacionalização - Antônio D. Pereira Filho](./AUXILIARES/bcavelino,+2+-+O+modelo+dinâmico+de+gestão+financeira+de+empresas.pdf) 
 
+## Instruções de uso
+No terminal:
+1. Instale as bibliotecas
+
+```pip install -r requirements.txt ```
+
+2. Navegue até o diretório do projeto
+
+ex: ```cd C:\Users\SeuUsuario\Capital_Structure_Analysis```
+
+3. Execute os scripts com os argumentos necessários
+
+| Parâmetro | Curto | Descrição | Obrigatório |
+| --- | --- | --- | --- | 
+| --token | -t | Token da API dadosdemercado | Não |
+| --option | -o | Opção de Análise a ser realizada [0-3] | Sim |
+| --report | -w | Gerar um arquivo de relatório com o nome fornecido | Não |
+
+As opções de análises e ferramentas disponíveis são:
+
+| Opção | Funcionalidade | Descrição |  
+| --- | --- | --- |
+| 0 | Modelo Dinâmico e Termômetro de Liquidez |  Cálculo das variáveis do Modelo Dinâmico: Capital de Giro (CDG), Necessidade de Capital de Giro (NCG) e Saldo de Tesouraria (T) a partir de dados de balanço (passivo e ativo permanentes/cíclicos/erráticos) e Cálculo do Termômetro de Liquidez (TL) a partir do saldo de tesouraria e da necessidade de capital de giro. |
+| 1 | Limites e Saldos de Caixa Ótimo  | Cálculo do Saldo de Caixa Ótimo (D*), Limite Superior de Caixa Ótimo(S*) e Saldo de Caixa Médio ótimo (D'). |
+| 2 | Fluxo de Caixa com Limites | Geração de gráfico do fluxo de caixa histórico com limites inferior, superior e saldo de caixa apropriado. Obtenção dos dados históricos via API dadosdemercado.com.br ou entrada manual pelo usuário. |
+| 3 | Estrutura de Capital | Geração de diagrama representando a estrutura de capital da empresa com base nos investimentos e fontes de capital. |
+
+### Exemplos
+| Prompt | Entradas | Resultado |
+| --- | --- | --- |
+| ```python3 capital_structure_analysis.py -o 0``` | 150000, 200000, 80000, 120000, 5000, 25000| ```Capital de Giro: -50000.0``` <br> ```Necessidades de Capital de Giro: 40000.0``` <br> ```Saldo de Tesouraria: 20000.0``` <br> ```Termômetro de Liquidez: 0.5``` | 
+| ```python3 capital_structure_analysis.py -o 1``` | 500, 4500000, 0.0002, 100000 | ```Saldo de Caixa Ótimo: 120358.13212446179``` <br> ```Limite Superior de Caixa Ótimo: 161074.39637338533```<br> ```Saldo de Caixa Médio Ótimo: 127144.17616594904``` |
+| ```python3 capital_structure_analysis.py -o 2``` | 5000000, 2000000, 7000000, 5, 2500000, 5000000, 3000000, 6000000, 4000000 | Imagem "Fluxo de Caixa com Limites.png" <img width="1000" height="500" alt="image" src="https://github.com/user-attachments/assets/52431a07-cf59-4ca7-b94a-0ae0c1e1175f" /> |
+| ```python3 capital_structure_analysis.py -o 2 -t TOKEN ``` | 5000000000, 1000000000, 7000000000, 5410 | Imagem "Fluxo de Caixa com Limites.png" <img width="1000" height="500" alt="image" src="https://github.com/user-attachments/assets/27cf5c7d-cd3b-4919-abe8-aa74fcf98b8b" /> | 
+| ```python3 capital_structure_analysis.py -o 3```| 30, 40, 15, 25, 30 | Imagem "Estrutura de Capital da Empresa.png" <img width="700" height="875" alt="image" src="https://github.com/user-attachments/assets/d72ebfb0-ca26-4c57-9bd7-9ad457e82baf" /> |
 
 ## REFERÊNCIAS
 - [Slides do capítulo 15](./AUXILIARES/Cap_15.pdf) disponibilizados no moodle pelo prof. Bruno Perez.

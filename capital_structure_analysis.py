@@ -12,15 +12,32 @@
 #   obtidos via API e informações fornecidas pelo usuário.          #
 # ----------------------------------------------------------------- #
 # - OPÇÕES DE ANÁLISE:                                              #
-# todo adicionar descrições das opções!
 #   0: Modelo Dinâmico e Termômetro de Liquidez                     #
-#       - 
+#       - Cálculo das variáveis do Modelo Dinâmico:                 #
+#       Capital de Giro (CDG), Necessidade de Capital de Giro (NCG) #
+#       e Saldo de Tesouraria (T) a partir de dados de balanço      #
+#       (passivo e ativo permanentes/cíclicos/erráticos).           #
+#       - Cálculo do Termômetro de Liquidez (TL) a partir do saldo  #
+#       de tesouraria e da necessidade de capital de giro.          #
+#       - Atualmente com dados fornecidos pelo usuário.             #
+#       - Futuro: integração com API para obtenção automática       #
+#       dos dados.                                                  # 
 #   1: Limites e Saldos de Caixa Ótimo                              #
-#      -
+#      - Cálculo do Saldo de Caixa Ótimo (D*),                      #
+#       Limite Superior de Caixa Ótimo(S*) e                        #
+#       Saldo de Caixa Médio ótimo (D')                             #
+#       - Atualmente com dados fornecidos pelo usuário.             #
+#       - Futuro: integração com API para obtenção automática       #
+#       dos dados.                                                  # 
 #   2: Fluxo de Caixa com Limites                                   #
-#     -
+#     - Geração de gráfico do fluxo de caixa histórico com limites  #
+#       inferior, superior e saldo de caixa apropriado.             #
+#     - Obtenção dos dados históricos via API dadosdemercado.com.br #
+#       ou entrada manual pelo usuário.                             #
 #   3: Estrutura de Capital                                         #
-#      -
+#      - Geração de diagrama representando a estrutura de capital   #
+#       da empresa com base nos investimentos e fontes de capital.  #  
+#      - Atualmente com dados fornecidos pelo usuário.              #
 # ----------------------------------------------------------------- #
 # - REPOSITÓRIO GITHUB:                                             #
 #   https://github.com/carlabferreira/Capital_Structure_Analysis    #
@@ -48,6 +65,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import argparse
 import math
+import requests
 from enum import Enum
 from PIL import Image, ImageDraw, ImageFont
 
@@ -98,8 +116,147 @@ def analise_caixa_otimo(c_fixo_transacao, variancia_fluxo_caixa, custo_oportunid
     
     return d
 
+def entrada_dados_usuario_op_fluxo_caixa():
+    print(f"Forneça dados para análise de fluxo de caixa com limites.\nSugestão: Caso deseje, utilize a opção {Option.LIMITES_E_SALDOS_DE_CAIXA_OTIMO} para calcular valores base de caixa ótimo." )
+    saldo_caixa_apropriado = float(input("Digite o saldo de caixa apropriado (D):\n"))
+    limite_inferior = float(input("Digite o limite inferior definido pela gestão (I):\n"))
+    limite_superior = float(input("Digite o limite superior (S):\n"))
+    
+    if limite_inferior >= saldo_caixa_apropriado or saldo_caixa_apropriado >= limite_superior:
+        print("Erro: Os valores fornecidos não satisfazem a condição I < D < S. Por favor, insira os valores novamente.\n")
+        return entrada_dados_usuario_op_fluxo_caixa()
+    
+    return float(saldo_caixa_apropriado), float(limite_inferior), float(limite_superior)
 
-#OP FLUXO DE CAIXA COM LIMITES
+def entrada_dados_historicos_usuario_op_fluxo_caixa():
+    num_periodos = int(input("Digite o número de períodos históricos disponíveis:\n"))
+    fluxos_caixa = {}
+    for i in range(num_periodos):
+        fluxo = float(input(f"Digite o fluxo de caixa do período {i+1}:\n"))
+        fluxos_caixa[i] = fluxo
+    return fluxos_caixa
+
+def obter_dados_historicos_api_op_fluxo_caixa(TOKEN):
+    print("Utilizando informações da API dadosdemercado.com.br para obter dados históricos de fluxo de caixa...")
+    print("Informação utilizada: \"operating\" (Caixa líquido atividades operacionais)")
+    
+    URL = "https://api.dadosdemercado.com.br/v1/companies"
+
+    CONSULTA = "cash_flows"
+    EMPRESA = input("Digite o código da empresa (CVM Code) para a qual deseja obter os dados (ex: padrão é 5410 para WEG):\n")
+    if not EMPRESA.isdigit():
+        print("Código da empresa inválido. Por favor, insira apenas números.")
+        return obter_dados_historicos_api_op_fluxo_caixa(TOKEN)
+    
+    URL_COMPLETA = f"{URL}/{EMPRESA}/{CONSULTA}"
+
+    HEADERS = {
+        'Authorization': f'Bearer {TOKEN}',
+        'Accept': 'application/json'
+    }
+
+    # Obtenção de informações via API
+    try:
+        response = requests.get(URL_COMPLETA, headers=HEADERS)
+
+        # Verifica se a requisição foi bem-sucedida (código 200)
+        if response.status_code == 200:
+            # Converte a resposta JSON para um dicionário Python
+            dados_json = response.json()
+            print(f"Dados Recebidos...")
+            # print(dados_json)
+            
+            # Define o período analisado (últimos 20 valores)
+            periodo_analisado = 20
+            
+            # Forma um dicionário de data e valor de operating
+            lista_de_balancos = dados_json
+
+            if not isinstance(lista_de_balancos, list) or not lista_de_balancos:
+                print("A resposta da API está vazia ou não é uma lista válida de balanços.")
+                return None
+            
+            ultimos_balancos = lista_de_balancos[-periodo_analisado:]
+
+            dados_finais = {
+                item['period_end']: item['operating'] 
+                for item in ultimos_balancos 
+                if 'period_end' in item and 'operating' in item
+            }
+
+            if ultimos_balancos and ultimos_balancos[0].get('period_type') == 'year':
+                 print("\nALERTA: Dados obtidos são ANUAIS. O Modelo Miller-Orr requer volatilidade DIÁRIA. Use estes dados com cautela ou procure dados trimestrais/diários, se disponíveis.")
+        
+            print(f"Dados processados (últimos {len(dados_finais)} períodos):")
+            
+            # Converte a chave (data) e o valor (operating) para listas separadas
+            datas = list(dados_finais.keys())
+            valores = list(dados_finais.values())
+            
+            print(f"Datas de Fim do Período: {datas}")
+            print(f"Valores de Operating: {valores}")
+            
+            return dados_finais
+
+        elif response.status_code == 401:
+            print(f"Erro {response.status_code}: Não Autorizado. Verifique se o seu token está correto ou expirado.")
+            return None
+
+        else:
+            print(f"Erro na requisição. Código HTTP: {response.status_code}")
+            print("Mensagem de erro:", response.text)
+            return None
+
+    except requests.exceptions.RequestException as e:
+        print(f"Ocorreu um erro de conexão: {e}")
+        return None
+
+def mostrar_grafico_fluxo_caixa_com_limites(dados_fluxo_caixa, saldo_caixa_apropriado, limite_inferior, limite_superior):
+    plt.figure(figsize=(10, 5))
+
+    # Utiliza os dados fornecidos para plotar o gráfico
+    datas = list(dados_fluxo_caixa.keys())
+    valores = list(dados_fluxo_caixa.values())
+    plt.plot(datas, valores, marker='o', label='Fluxo de Caixa Histórico', color='black')
+
+    # Imprime as linhas dos limites
+    x_pos = len(datas) - 1 + 0.1  # Posição x para as legendas ao lado da linha
+    plt.axhline(y=saldo_caixa_apropriado, color='g', linestyle='--', xmax = len(datas) - 1)
+    plt.axhline(y=limite_inferior, color='r', linestyle='--', xmax = len(datas) - 1)
+    plt.axhline(y=limite_superior, color='b', linestyle='--', xmax = len(datas) - 1)
+
+    # Adiciona legendas ao lado da linha para os limites
+    # Obtém os limites atuais do eixo y para posicionar o texto corretamente
+    y_min, y_max = plt.ylim()
+    amplitude_y = y_max - y_min
+    offset_percentual = 0.02  # Deslocamento de 1% da amplitude do eixo y
+    deslocamento_y = amplitude_y * offset_percentual
+    
+    
+    plt.text(x_pos, saldo_caixa_apropriado - deslocamento_y, '(D)', 
+         color='g', va='center', ha='left', fontsize=9)
+    
+    plt.text(x_pos, limite_inferior + deslocamento_y, '(I)', 
+         color='r', va='center', ha='left', fontsize=9)
+    
+    plt.text(x_pos, limite_superior - deslocamento_y, '(S)', 
+         color='b', va='center', ha='left', fontsize=9)
+
+    # Adiciona informações relevantes ao gráfico
+    plt.title('Fluxo de Caixa com Limites')
+    plt.xlabel('Períodos')
+    plt.ylabel('Caixa (R$)')
+    plt.legend()
+    plt.grid()
+    
+    # Ajuste dos rótulos do eixo x para melhor visualização
+    plt.xticks(rotation=45, ha='right')
+    plt.tight_layout()
+    
+    # Salva a imagem
+    plt.savefig("Fluxo de Caixa com Limites.png")
+
+    return
 #(...)
 #OP FLUXO DE CAIXA COM LIMITES
 
@@ -248,7 +405,20 @@ def main():
 
     elif (opt == Option.FLUXO_DE_CAIXA_COM_LIMITES):
         print("Análise: Fluxo de Caixa com Limites selecionada.")
-        pass
+        saldo_caixa_apropriado, limite_inferior, limite_superior = entrada_dados_usuario_op_fluxo_caixa()
+        if not token:
+            print("Nenhum token de API fornecido. Insira os valores históricos manualmente.")
+            dados_fluxo_caixa = entrada_dados_historicos_usuario_op_fluxo_caixa()
+        else:
+            print("Token de API fornecido. Obtendo dados via API...")
+            dados_fluxo_caixa = obter_dados_historicos_api_op_fluxo_caixa(token)
+        
+        if dados_fluxo_caixa is None:
+            print("Não foi possível obter os dados históricos de fluxo de caixa. Encerrando a análise.")
+            return
+
+        mostrar_grafico_fluxo_caixa_com_limites(dados_fluxo_caixa, saldo_caixa_apropriado, limite_inferior, limite_superior)
+
     elif (opt == Option.ESTRUTURA_DE_CAPITAL):
         print("Análise: Estrutura de Capital selecionada.")
         iopg, iaf, dlcp, dlp, cp = entrada_dados_estrutura_de_capital_da_empresa()
@@ -260,6 +430,7 @@ def main():
         report_fname = args.report
         if not report_fname.endswith(".html"):
             report_fname += ".html"
+        print(f"Geração de relatório solicitada mas não implementada ainda.")
         # todo generate report
 
 
