@@ -100,10 +100,12 @@ Esta seção apresenta um breve resumo dos conceitos utilizados para realizaçã
 ## Instruções de uso
 No terminal:
 1. Instale as bibliotecas
+
 ```pip install -r requirements.txt ```
 
 2. Navegue até o diretório do projeto
-ex: ```cd C:\Users\SeuUsuario\Capital_Structure_Analysis"
+
+ex: ```cd C:\Users\SeuUsuario\Capital_Structure_Analysis```
 
 3. Execute os scripts com os argumentos necessários
 
